@@ -1,6 +1,7 @@
 import {authAPI} from "../api/todolists-api";
 import {Dispatch} from "redux";
 import {setIsLoggedInAC} from "../features/Login/authReducer";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
 const initialState: InitialStateType = {
     status: 'idle',
@@ -8,18 +9,27 @@ const initialState: InitialStateType = {
     isInitialized: false
 }
 
-export const appReducer = (state: InitialStateType = initialState, action: ActionsType): InitialStateType => {
-    switch (action.type) {
-        case 'APP/SET-STATUS':
-            return {...state, status: action.status}
-        case 'APP/SET-ERROR':
-            return {...state, error: action.error}
-        case "SET_IS_INITIALIZED":
-            return {...state, isInitialized: true}
-        default:
-            return {...state}
+let slice = createSlice({
+    name: "app",
+    initialState: initialState,
+    reducers: {
+        setAppErrorAC: (state, actions: PayloadAction<{ error: string | null }>) => {
+            state.error = actions.payload.error
+        },
+        setAppStatusAC: (state, actions: PayloadAction<{ status: RequestStatusType }>) => {
+            state.status = actions.payload.status
+        },
+        setIsInitialized: (state) => {
+            state.isInitialized = true
+        }
     }
-}
+})
+
+export const appReducer = slice.reducer
+export const setAppErrorAC = slice.actions.setAppErrorAC
+export const setAppStatusAC = slice.actions.setAppStatusAC
+export const setIsInitialized = slice.actions.setIsInitialized
+
 
 export type RequestStatusType = 'idle' | 'loading' | 'succeeded' | 'failed'
 export type InitialStateType = {
@@ -28,15 +38,6 @@ export type InitialStateType = {
     // если ошибка какая-то глобальная произойдёт - мы запишем текст ошибки сюда
     error: string | null
     isInitialized: boolean
-}
-
-export const setAppErrorAC = (error: string | null) => ({type: 'APP/SET-ERROR', error} as const)
-export const setAppStatusAC = (status: RequestStatusType) => ({type: 'APP/SET-STATUS', status} as const)
-export type setIsInitializedType = ReturnType<typeof setIsInitialized>
-export const setIsInitialized = () => {
-    return {
-        type: "SET_IS_INITIALIZED"
-    } as const
 }
 
 export const initializeAppTC = () => (dispatch: Dispatch) => {
@@ -50,12 +51,3 @@ export const initializeAppTC = () => (dispatch: Dispatch) => {
             dispatch(setIsInitialized())
         })
 }
-
-
-export type SetAppErrorActionType = ReturnType<typeof setAppErrorAC>
-export type SetAppStatusActionType = ReturnType<typeof setAppStatusAC>
-
-type ActionsType =
-    | SetAppErrorActionType
-    | SetAppStatusActionType
-    | setIsInitializedType
