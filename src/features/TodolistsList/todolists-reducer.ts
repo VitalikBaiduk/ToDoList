@@ -26,7 +26,6 @@ let slice = createSlice({
         changeTodolistFilterAC: (state, action: PayloadAction<{ id: string, filter: FilterValuesType }>) => {
             let index = state.findIndex((tl) => tl.id === action.payload.id)
             state[index].filter = action.payload.filter
-            // state.map(tl => tl.id === action.payload.id ? {...tl, filter: action.payload.filter} : tl)
         },
         changeTodolistEntityStatusAC: (state, action: PayloadAction<{ id: string, status: RequestStatusType }>) => {
             let index = state.findIndex((tl) => tl.id === action.payload.id)
